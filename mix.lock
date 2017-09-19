@@ -1,0 +1,5 @@
+%{"chatter": {:hex, :chatter, "0.0.15", "a07fa258f2c796e6089eba5cf41ef5a1b826caa9d2f65d3793f1f8a30c36ab7a", [], [{:exactor, "~> 2.2", [hex: :exactor, repo: "hexpm", optional: false]}, {:ranch, "~> 1.2", [hex: :ranch, repo: "hexpm", optional: false]}, {:snappy, "~> 1.1", [hex: :snappy, repo: "hexpm", optional: false]}], "hexpm"},
+  "exactor": {:hex, :exactor, "2.2.3", "a6972f43bb6160afeb73e1d8ab45ba604cd0ac8b5244c557093f6e92ce582786", [], [], "hexpm"},
+  "ranch": {:hex, :ranch, "1.4.0", "10272f95da79340fa7e8774ba7930b901713d272905d0012b06ca6d994f8826b", [], [], "hexpm"},
+  "snappy": {:hex, :snappy, "1.1.1", "d63449a58f1358046b7adaec166ae8929c2b19881e76c4e13284304fe887c39a", [], [], "hexpm"},
+  "xxhash": {:git, "https://github.com/pierresforge/erlang-xxhash", "9b2f35040395f590524ebeccfa65dd52adebbd60", []}}
