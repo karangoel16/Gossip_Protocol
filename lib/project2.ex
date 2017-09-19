@@ -1,18 +1,5 @@
 defmodule Project2 do
   use GenServer
-  @moduledoc """
-  Documentation for Project2.
-  """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Project2.hello
-      :world
-
-  """
   def start_link do
     GenServer.start_link(__MODULE__,:ok,name: :Server)
   end
@@ -32,7 +19,7 @@ defmodule Project2 do
   def spawnner(number_of_node,temp\\0) do
     IO.puts(temp)
     case String.to_integer(number_of_node)>temp do
-      true->Task.async(fn->Project2.Client.start_link(temp) end)
+      true->Process.spawn((fn->Project2.Client.start_link(Integer.to_string(temp)|>String.to_atom) end),[])
             spawnner(number_of_node,temp+1)
              {:ok}
       false->{:ok}
@@ -41,8 +28,5 @@ defmodule Project2 do
 
   def loop do
     loop
-  end
-  def hello do
-    :world
   end
 end
