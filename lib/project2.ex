@@ -8,8 +8,7 @@ defmodule Project2 do
   end
 
   def main(args\\[]) do
-    if List.to_tuple(args)|>tuple_size<2 do
-      IO.puts ("here")
+    if List.to_tuple(args)|>tuple_size<3 do
       :init.stop()
     end
     number_of_node=elem(List.to_tuple(args),0)
@@ -77,7 +76,7 @@ defmodule Project2 do
         end)
         end)
         end
-    GenServer.cast({:"3",Node.self()},{:msg,"hello",3})
+      GenServer.cast({:"3",Node.self()},{:msg,"hello",3,elem(args|>List.to_tuple,2)|>String.to_atom})
     loop()
   end
 
