@@ -10,16 +10,29 @@ defmodule Project2.Client do
     end
 
     def init(:ok) do
-        {:ok,%{}}
+        {:ok,{}}
     end
 
-    def handle_call({:msg,msg},_from,state) do
-      var={:ok,msg}
-      {:ok,state}
+    def handle_call({check , msg , name},_from,state) do
+      case check do
+          :msg->var=:rand.uniform(tuple_size(state))
+                GenServer.call({Integer.to_string(var)|>String.to_atom,Node.self()},{:msg,msg},:infinite)
+                {:reply,msg,state}
+          :complete->
+                state=Enum.to_list(1..String.to_integer(msg))|>List.to_tuple
+                state=Tuple.delete_at(state,name-1)#delete yourself from list
+                {:reply,msg,state }
+          :line->#we need to add previous and the new state here
+                state=Tuple.append(state,msg)
+                {:reply,msg,state}
+          :link->#we made this to check our network
+                {:reply,state,state}
+      end
     end
 
 
     def loop do
         Process.sleep(1_000_000)
+        loop()
     end
 end
