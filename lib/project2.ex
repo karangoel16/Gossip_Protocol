@@ -18,13 +18,13 @@ defmodule Project2 do
     temp=:os.system_time(:millisecond)
     Enum.map(1..String.to_integer(number_of_node),fn(x)->spawn(fn->Project2.Client.start_link(Integer.to_string(x)|>String.to_atom) end)end)
     case elem(List.to_tuple(args),1)|>String.to_atom do
-      :full->Enum.map(1..String.to_integer(number_of_node),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:complete,number_of_node,x})end)
-      :line->Enum.map(2..String.to_integer(number_of_node),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:line,x-1,x})end)
+      :full->Enum.map(1..String.to_integer(number_of_node),fn(x)->GenServer.cast({Integer.to_string(x)|>String.to_atom,Node.self()},{:complete,number_of_node,x})end)
+      :line->Enum.map(2..String.to_integer(number_of_node),fn(x)->GenServer.cast({Integer.to_string(x)|>String.to_atom,Node.self()},{:line,x-1,x})end)
              #this is for backward adding of the nodes
-             Enum.map(1..(String.to_integer(number_of_node)-1),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:line,x+1,x})end)
+             Enum.map(1..(String.to_integer(number_of_node)-1),fn(x)->GenServer.cast({Integer.to_string(x)|>String.to_atom,Node.self()},{:line,x+1,x})end)
              #this is for forward adding of the terminal in the state of the GenServer
       end
-    IO.puts(:os.system_time(:millisecond))
+    IO.puts(:os.system_time(:millisecond)-temp)
     #loop()
   end
 
