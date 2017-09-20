@@ -16,16 +16,67 @@ defmodule Project2 do
     Project2.Exdistutils.start_distributed(:project2)
     start_link(number_of_node) #this is where the server genserver starts
     IO.puts "... build topology"
+    case elem(List.to_tuple(args),1) do
+      "2d"->number_of_node=round(:math.ceil(:math.sqrt(number_of_node|>String.to_integer)))
+            number_of_node=number_of_node*number_of_node
+            number_of_node=number_of_node|>Integer.to_string
+      "full"->""
+      "line"->""
+      "Im2d"->""
+    end
+    var=number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round
     GenServer.cast({:Server,Node.self()},{:add_time,:os.system_time(:millisecond)})
-    IO.inspect Enum.map(1..String.to_integer(number_of_node),fn(x)->spawn(fn->Project2.Client.start_link(Integer.to_string(x)|>String.to_atom) end)end)
-    
     case elem(List.to_tuple(args),1)|>String.to_atom do
-      :full->Enum.map(1..String.to_integer(number_of_node),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:complete,number_of_node,x},:infinity)end)
-      :line->Enum.map(2..String.to_integer(number_of_node),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:line,x-1,x},:infinity)end)
+      :full->
+        IO.inspect Enum.map(1..String.to_integer(number_of_node),fn(x)->spawn(fn->Project2.Client.start_link(Integer.to_string(x)|>String.to_atom) end)end)
+             Enum.map(1..String.to_integer(number_of_node),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:complete,number_of_node,x},:infinity)end)
+      :line->IO.inspect Enum.map(1..String.to_integer(number_of_node),fn(x)->spawn(fn->Project2.Client.start_link(Integer.to_string(x)|>String.to_atom) end)end)
+        Enum.map(2..String.to_integer(number_of_node),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:line,x-1,x},:infinity)end)
              #this is for backward adding of the nodes
              Enum.map(1..(String.to_integer(number_of_node)-1),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:line,x+1,x},:infinity)end)
              #this is for forward adding of the terminal in the state of the GenServer
-      end
+      :"2d"->
+        IO.inspect Enum.map(1..var*var,fn(x)->spawn(fn->Project2.Client.start_link(Integer.to_string(x)|>String.to_atom) end)end)
+            Enum.map(1..var,fn(row)->
+              Enum.map(1..var,fn(col)->
+                Enum.map(1..4,fn(x)->
+                  temp=(row-1)*var+(col-1)+1
+                  temp=case x do
+                      1->temp+1;#moving ahead condition
+                      2->temp-1;#moving backward condition
+                      3->temp-var#moving col up
+                      4->temp+var#moving col down
+                    end
+                  case temp<=0 || temp>var*var do
+                    false->
+                        GenServer.call({((row-1)*var+(col-1)+1)|>Integer.to_string|>String.to_atom,Node.self()},{:line,temp,(row-1)*var+(col-1)+1})
+                    true->""
+                  end
+                end)
+              end)
+             end)
+      :Im2d->
+        IO.inspect Enum.map(1..var*var,fn(x)->spawn(fn->Project2.Client.start_link(Integer.to_string(x)|>String.to_atom) end)end)
+        Enum.map(1..var,fn(row)->
+        Enum.map(1..var,fn(col)->
+          Enum.map(1..4,fn(x)->
+            temp=(row-1)*var+(col-1)+1
+            temp=case x do
+                1->temp+1;#moving ahead condition
+                2->temp-1;#moving backward condition
+                3->temp-var#moving col up
+                4->temp+var#moving col down
+              end
+            case temp<=0 || temp>var*var do
+              false->GenServer.call({((row-1)*var+(col-1)+1)|>Integer.to_string|>String.to_atom,Node.self()},{:line,temp,((row-1)*var+(col-1)+1)},:infinity)
+              true->""
+            end
+            rand=:rand.uniform(var*var) #this is the random node which is connected 
+            GenServer.call({((row-1)*var+col)|>Integer.to_string|>String.to_atom,Node.self()},{:line,rand,((row-1)*var+col)},:infinity)
+          end)
+        end)
+        end)
+        end
     GenServer.cast({:"3",Node.self()},{:msg,"hello",3})
     loop()
   end
@@ -44,16 +95,6 @@ defmodule Project2 do
       Process.exit(self(),:normal)
     end
     {:reply,"",state}
-  end
-
-  def spawnner(number_of_node,temp\\0) do
-    IO.puts(temp)
-    case String.to_integer(number_of_node)>temp do
-      true->Process.spawn((fn->Project2.Client.start_link(Integer.to_string(temp)|>String.to_atom) end),[])
-            spawnner(number_of_node,temp+1)
-             {:ok}
-      false->{:ok}
-  end
   end
 
   def loop do

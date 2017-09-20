@@ -31,6 +31,7 @@ defmodule Project2.Client do
     end
     def handle_cast({:msg , msg , name},state) do
         map=elem(state,1)
+            #IO.inspect state
             case Map.get(map,msg,0)>10 do
         #Need to call GenServer and Stop it
             true->
