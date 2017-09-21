@@ -24,6 +24,7 @@ defmodule Project2 do
       "Im2d"->""
     end
     var=number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round
+    type=elem(args|>List.to_tuple,2)
     GenServer.cast({:Server,Node.self()},{:add_time,:os.system_time(:millisecond)})
     case elem(List.to_tuple(args),1)|>String.to_atom do
       :full->
@@ -76,7 +77,20 @@ defmodule Project2 do
         end)
         end)
         end
-      GenServer.cast({:"3",Node.self()},{:msg,"hello",3,elem(args|>List.to_tuple,2)|>String.to_atom})
+      case type do
+        "gossip"->
+          GenServer.cast({:"3",Node.self()},{:msg,"hello",3,type})
+        "push-sum"->
+          temp_val=
+          case elem(List.to_tuple(args),1)|>String.to_atom do
+            :full->number_of_node|>String.to_integer
+            :line->number_of_node|>String.to_integer
+            :"2d"->var*var
+            :Im2d->var*var
+          end
+          Enum.map(1..temp_val,fn(x)->GenServer.call({x|>Integer.to_string|>String.to_atom,Node.self()},{:add_state,"",x},:infinity)end)
+          GenServer.cast({:"3",Node.self()},{:msg,{},3,type})
+      end
     loop()
   end
 
