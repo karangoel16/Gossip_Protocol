@@ -13,7 +13,6 @@ defmodule Project2.Client do
     end
     def handle_call({check , msg , name},_from,state) do
       case check do
-          
           :complete->
                 var=Enum.to_list(1..String.to_integer(msg))|>List.to_tuple
                 var=Tuple.delete_at(var,name-1)#delete yourself from list
@@ -32,6 +31,11 @@ defmodule Project2.Client do
       end
     end
     def handle_cast({:msg , msg , name,type ,sleep},state) do
+            wait_time=
+            case tuple_size(elem(state,0))==sleep-1 do
+                true->sleep|>:math.sqrt|>ceil
+                false->100
+            end
             case type do
                 "gossip"->
                     map=elem(state,1)
@@ -43,7 +47,7 @@ defmodule Project2.Client do
                         var=:rand.uniform(tuple_size(elem(state,0)))
                         map=Map.put(map,msg,Map.get(map,msg,0)+1)
                         GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,sleep})
-                        Process.sleep(sleep|>:math.sqrt|>round)
+                        Process.sleep(wait_time)
                         GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type,sleep})
                         {:noreply,{elem(state,0),map}}
                     end
