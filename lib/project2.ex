@@ -79,7 +79,8 @@ defmodule Project2 do
         end
       case type do
         "gossip"->
-          GenServer.cast({:"3",Node.self()},{:msg,"hello",3,type})
+          rand=number_of_node|>String.to_integer|>:rand.uniform
+          GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,"hello",rand,type})
         "push-sum"->
           temp_val=
           case elem(List.to_tuple(args),1)|>String.to_atom do
@@ -89,7 +90,8 @@ defmodule Project2 do
             :Im2d->var*var
           end
           Enum.map(1..temp_val,fn(x)->GenServer.call({x|>Integer.to_string|>String.to_atom,Node.self()},{:add_state,"",x},:infinity)end)
-          GenServer.cast({:"3",Node.self()},{:msg,{},3,type})
+          rand=:rand.uniform(temp_val)
+          GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,{},rand,type})
       end
     loop()
   end
