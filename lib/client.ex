@@ -31,7 +31,7 @@ defmodule Project2.Client do
                 {:reply,state,state}
       end
     end
-    def handle_cast({:msg , msg , name,type},state) do
+    def handle_cast({:msg , msg , name,type ,sleep},state) do
             case type do
                 "gossip"->
                     map=elem(state,1)
@@ -42,9 +42,9 @@ defmodule Project2.Client do
                     false->
                         var=:rand.uniform(tuple_size(elem(state,0)))
                         map=Map.put(map,msg,Map.get(map,msg,0)+1)
-                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type})
-                        Process.sleep(tuple_size(elem(state,0))|>:math.sqrt|>round)
-                        GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type})
+                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,sleep})
+                        Process.sleep(sleep|>:math.sqrt|>round)
+                        GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type,sleep})
                         {:noreply,{elem(state,0),map}}
                     end
                 "push-sum"->
@@ -53,7 +53,7 @@ defmodule Project2.Client do
                         case tuple_size(msg)==0 do
                             true->
                                 {s,w}=Map.get(map,"state")
-                                GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,{s/2,w/2},elem(elem(state,0),var-1),type})
+                                GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,{s/2,w/2},elem(elem(state,0),var-1),type,sleep})
                                 #spawn(fn->cast_call(:msg,{s/2,w/2},name,type)end)
                                 map=Map.put(map,"state",{s+s/2,w+w/2})
                                 map=Map.put(map,"balance",1)
@@ -61,7 +61,7 @@ defmodule Project2.Client do
                             false->
                                 case Map.get(map,"balance")>=3 do
                                     true->
-                                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type})
+                                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,sleep})
                                         #this is to terminate the node
                                         GenServer.call({:Server,Node.self()},{:add_val,name},:infinity)
                                     {:noreply,state}
@@ -77,7 +77,7 @@ defmodule Project2.Client do
                                             false->Map.put(map,"balance",1)
                                         end
                                         map=Map.put(map,"state",{s1/2+s,w1/2+w})
-                                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,{s1/2,w1/2},elem(elem(state,0),var-1),type})
+                                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,{s1/2,w1/2},elem(elem(state,0),var-1),type,sleep})
                                         {:noreply,{elem(state,0),map}}
                                 end
                                 
