@@ -43,7 +43,7 @@ defmodule Project2.Client do
                         var=:rand.uniform(tuple_size(elem(state,0)))
                         map=Map.put(map,msg,Map.get(map,msg,0)+1)
                         GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type})
-                        Process.sleep(100)
+                        Process.sleep(tuple_size(elem(state,0))|>:math.sqrt|>round)
                         GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type})
                         {:noreply,{elem(state,0),map}}
                     end
