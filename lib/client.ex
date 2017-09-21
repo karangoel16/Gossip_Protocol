@@ -32,10 +32,13 @@ defmodule Project2.Client do
     end
     def handle_cast({:msg , msg , name,type ,sleep},state) do
             wait_time=
-            case tuple_size(elem(state,0))==sleep-1 do
-                true->sleep|>:math.sqrt|>ceil
-                false->100
+            case tuple_size(elem(state,0)) do
+                4->100
+                5->100
+                2->100
+                _->sleep|>:math.sqrt|>round
             end
+            #IO.puts wait_time
             case type do
                 "gossip"->
                     map=elem(state,1)
