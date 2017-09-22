@@ -36,27 +36,33 @@ defmodule Project2.Client do
                 4->100
                 5->100
                 2->100
-                _->sleep|>:math.sqrt|>round
+                _->100
             end
             #IO.puts wait_time
+            var=:rand.uniform(tuple_size(elem(state,0)))
+            case sleep do
+                1->GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,0})
+                   Process.sleep(wait_time)
+                   GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type,1}) 
+                {:noreply,state} 
+                0->""
+            end
             case type do
                 "gossip"->
                     map=elem(state,1)
                     case Map.get(map,msg,0)>10 do
-                    true->var=:rand.uniform(tuple_size(elem(state,0)))
+                    true->
                         GenServer.call({:Server,Node.self()},{:add_val,name},:infinity)
                         {:noreply,state}
                     false->
-                        var=:rand.uniform(tuple_size(elem(state,0)))
                         map=Map.put(map,msg,Map.get(map,msg,0)+1)
-                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,sleep})
+                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,0})
                         Process.sleep(wait_time)
-                        GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type,sleep})
+                        GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type,1})
                         {:noreply,{elem(state,0),map}}
                     end
                 "push-sum"->
                         map=elem(state,1)
-                        var=:rand.uniform(tuple_size(elem(state,0)))
                         case tuple_size(msg)==0 do
                             true->
                                 {s,w}=Map.get(map,"state")
