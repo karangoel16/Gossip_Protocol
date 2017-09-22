@@ -15,17 +15,15 @@ defmodule Project2 do
     Project2.Exdistutils.start_distributed(:project2)
     start_link(number_of_node) #this is where the server genserver starts
     IO.puts "... build topology"
+    number_of_node=
     case elem(List.to_tuple(args),1) do
-      "2d"->number_of_node=round(:math.ceil(:math.sqrt(number_of_node|>String.to_integer)))
-            number_of_node=number_of_node*number_of_node
-            number_of_node=number_of_node|>Integer.to_string
-      "full"->""
-      "line"->""
-      "Im2d"->""
+      "2d"->:math.pow(number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round,2)|>round|>Integer.to_string
+      "full"->number_of_node
+      "line"->number_of_node
+      "Im2d"->:math.pow(number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round,2)|>round|>Integer.to_string
     end
     var=number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round
     type=elem(args|>List.to_tuple,2)
-    GenServer.cast({:Server,Node.self()},{:add_time,:os.system_time(:millisecond)})
     case elem(List.to_tuple(args),1)|>String.to_atom do
       :full->
         IO.inspect Enum.map(1..String.to_integer(number_of_node),fn(x)->spawn(fn->Project2.Client.start_link(Integer.to_string(x)|>String.to_atom) end)end)
@@ -77,10 +75,12 @@ defmodule Project2 do
         end)
         end)
         end
+        IO.puts ".... start protocol"
+        GenServer.cast({:Server,Node.self()},{:add_time,:os.system_time(:millisecond)})
       case type do
         "gossip"->
           rand=number_of_node|>String.to_integer|>:rand.uniform
-          GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,"hello",rand,type,number_of_node|>String.to_integer})
+          GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,"hello",rand,type,1})
         "push-sum"->
           temp_val=
           case elem(List.to_tuple(args),1)|>String.to_atom do

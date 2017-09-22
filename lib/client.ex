@@ -36,7 +36,17 @@ defmodule Project2.Client do
                 4->100
                 5->100
                 2->100
-                _->sleep|>:math.sqrt|>round
+                1->100
+                3->100
+                _->tuple_size(elem(state,0))|>:math.sqrt|>round
+            end
+            case sleep do
+                0-> var=:rand.uniform(tuple_size(elem(state,0)))
+                GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,1})
+                Process.sleep(wait_time)
+                GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type,0})
+                    {:noreply,state}
+                1->""
             end
             #IO.puts wait_time
             case type do
@@ -49,9 +59,9 @@ defmodule Project2.Client do
                     false->
                         var=:rand.uniform(tuple_size(elem(state,0)))
                         map=Map.put(map,msg,Map.get(map,msg,0)+1)
-                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,sleep})
+                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,1})
                         Process.sleep(wait_time)
-                        GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type,sleep})
+                        GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type,0})
                         {:noreply,{elem(state,0),map}}
                     end
                 "push-sum"->
