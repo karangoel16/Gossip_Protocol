@@ -15,19 +15,20 @@ defmodule Project2 do
     Project2.Exdistutils.start_distributed(:project2)
     start_link(number_of_node) #this is where the server genserver starts
     IO.puts "... build topology"
+    number_of_node=
     case elem(List.to_tuple(args),1) do
-      "2d"->number_of_node=round(:math.ceil(:math.sqrt(number_of_node|>String.to_integer)))
-            number_of_node=number_of_node*number_of_node
-            number_of_node=number_of_node|>Integer.to_string
-      "full"->""
-      "line"->""
-      "Im2d"->""
+      "2d"->:math.pow(number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round,2)|>round|>Integer.to_string
+      "full"->number_of_node
+      "line"->number_of_node
+      "Im2d"->:math.pow(number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round,2)|>round|>Integer.to_string
     end
+    IO.inspect Enum.map(1..String.to_integer(number_of_node),fn(x)->spawn(fn->Project2.Client.start_link(Integer.to_string(x)|>String.to_atom) end)end)
     var=number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round
     type=elem(args|>List.to_tuple,2)
-    IO.inspect Enum.map(1..String.to_integer(number_of_node),fn(x)->spawn(fn->Project2.Client.start_link(Integer.to_string(x)|>String.to_atom) end)end)
+    com=MapSet.new(Enum.into(1..String.to_integer(number_of_node),[]))
+    #com=MapSet.put(MapSet.new,Enum.to_list(1..String.to_integer(number_of_node))|>List.to_tuple)
     case elem(List.to_tuple(args),1)|>String.to_atom do
-      :full->Enum.map(1..String.to_integer(number_of_node),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:complete,number_of_node,x},:infinity)end)
+      :full->Enum.map(1..String.to_integer(number_of_node),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:complete,com,x},:infinity)end)
       :line->Enum.map(2..String.to_integer(number_of_node),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:line,x-1,x},:infinity)end)
              #this is for backward adding of the nodes
              Enum.map(1..(String.to_integer(number_of_node)-1),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:line,x+1,x},:infinity)end)
@@ -66,18 +67,18 @@ defmodule Project2 do
               false->GenServer.call({((row-1)*var+(col-1)+1)|>Integer.to_string|>String.to_atom,Node.self()},{:line,temp,((row-1)*var+(col-1)+1)},:infinity)
               true->""
             end
-            rand=:rand.uniform(var*var) #this is the random node which is connected 
+            rand=:rand.uniform(var*var) #this is the random node which is connected
             GenServer.call({((row-1)*var+col)|>Integer.to_string|>String.to_atom,Node.self()},{:line,rand,((row-1)*var+col)},:infinity)
           end)
         end)
         end)
         end
-      IO.puts  "..... start protocol"
-      GenServer.cast({:Server,Node.self()},{:add_time,:os.system_time(:millisecond)})
+        IO.puts ".... start protocol"
+        GenServer.cast({:Server,Node.self()},{:add_time,:os.system_time(:millisecond)})
       case type do
         "gossip"->
           rand=number_of_node|>String.to_integer|>:rand.uniform
-          GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,"hello",rand,type,0})
+          GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,"hello",rand,type,4})
         "push-sum"->
           temp_val=
           case elem(List.to_tuple(args),1)|>String.to_atom do
@@ -96,7 +97,7 @@ defmodule Project2 do
   def handle_cast({:add_time,time},state) do
     {:noreply,Tuple.append(state,time)}
   end
-  
+
   def handle_call({:add_val,name},_from,state) do
     map=Map.put(elem(state,1),name,1)
     state=Tuple.delete_at(state,1)
