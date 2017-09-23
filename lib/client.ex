@@ -3,7 +3,7 @@ defmodule Project2.Client do
 
     def start_link(args) do
         GenServer.start_link(__MODULE__,:ok,name: args)
-        loop()
+        #loop()
     end
 
     def init(:ok) do
@@ -42,10 +42,13 @@ defmodule Project2.Client do
             wait_time=100
             var=:rand.uniform(tuple_size(elem(state,0)))
             case sleep do
-                1->GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,0})
-                   Process.sleep(wait_time)
+                1->case GenServer.whereis({var|>Integer.to_string|>String.to_atom,Node.self}) != nil do
+                   true->GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,0})
+                         Process.sleep(wait_time)
+                   _->nil
+                   end
                    GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type,1})
-                {:noreply,state}
+                   {:noreply,state}
                 _->""
             end
             case type do
@@ -57,7 +60,10 @@ defmodule Project2.Client do
                         {:noreply,state}
                     false->
                         map=Map.put(map,msg,Map.get(map,msg,0)+1)
-                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,0})
+                        case GenServer.whereis({var|>Integer.to_string|>String.to_atom,Node.self}) != nil do
+                            true->GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,0})
+                            _->nil
+                        end
                         Process.sleep(wait_time)
                         GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type,1})
                         {:noreply,{elem(state,0),map}}
