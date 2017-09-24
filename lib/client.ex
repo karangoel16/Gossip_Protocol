@@ -42,10 +42,10 @@ defmodule Project2.Client do
             wait_time=100
             var=:rand.uniform(tuple_size(elem(state,0)))
             case sleep do
-                1->case GenServer.whereis({var|>Integer.to_string|>String.to_atom,Node.self}) != nil do
+                1->case GenServer.whereis({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self()}) != nil do
                    true->GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,0})
                          Process.sleep(wait_time)
-                   _->nil
+                   _->""
                    end
                    GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type,1})
                    {:noreply,state}
@@ -60,9 +60,10 @@ defmodule Project2.Client do
                         {:noreply,state}
                     false->
                         map=Map.put(map,msg,Map.get(map,msg,0)+1)
-                        case GenServer.whereis({var|>Integer.to_string|>String.to_atom,Node.self}) != nil do
-                            true->GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,0})
-                            _->nil
+                        case GenServer.whereis({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self()}) != nil do
+                            true->
+                                GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,0})
+                            _->""
                         end
                         Process.sleep(wait_time)
                         GenServer.cast({Integer.to_string(name)|>String.to_atom,Node.self()},{:msg,msg,name,type,1})

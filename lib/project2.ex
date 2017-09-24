@@ -79,8 +79,7 @@ defmodule Project2 do
         "gossip"->
           rand=number_of_node|>String.to_integer|>:rand.uniform
           #we are testing failure in the system
-          IO.puts rand
-          #GenServer.stop({rand|>Integer.to_string|>String.to_atom,Node.self()})
+          GenServer.stop({rand|>Integer.to_string|>String.to_atom,Node.self()})
           rand=number_of_node|>String.to_integer|>:rand.uniform
           GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,"hello",rand,type,4})
         "push-sum"->
@@ -103,7 +102,7 @@ defmodule Project2 do
       :add_time->{:noreply,Tuple.append(state,time)}
       :check_state->
         val=elem(state,0)#we will take out the first mapset
-        val=MapSet.new(Enum.into(1..length(MapSet.to_list(val)),[],fn(x)-> if GenServer.whereis({x|>Integer.to_string|>String.to_atom,Node.self()}) != nil do x end end))#then we will delete from that value
+        val=MapSet.new(Enum.into(MapSet.to_list(val),[],fn(x)-> if GenServer.whereis({x|>Integer.to_string|>String.to_atom,Node.self()}) != nil do x end end))#then we will delete from that value
         val=MapSet.delete(val,nil)
         state=Tuple.delete_at(state,0)
         {:noreply,Tuple.insert_at(state,0,val)}
@@ -130,7 +129,7 @@ defmodule Project2 do
 
   def loop do
     GenServer.cast({:Server,Node.self()},{:check_state,""})
-    Process.sleep(10000)
+    Process.sleep(1000)
     loop()
   end
 end
