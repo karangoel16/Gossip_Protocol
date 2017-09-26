@@ -12,9 +12,6 @@ defmodule Project2 do
       :init.stop()
     end
     number_of_node=elem(List.to_tuple(args),0)
-    Project2.Exdistutils.start_distributed(:project2)
-    start_link(number_of_node) #this is where the server genserver starts
-    IO.puts "... build topology"
     number_of_node=
     case elem(List.to_tuple(args),1) do
       "2d"->:math.pow(number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round,2)|>round|>Integer.to_string
@@ -23,6 +20,9 @@ defmodule Project2 do
       "Im2d"->:math.pow(number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round,2)|>round|>Integer.to_string
     end
     IO.inspect Enum.map(1..String.to_integer(number_of_node),fn(x)->spawn(fn->Project2.Client.start_link(Integer.to_string(x)|>String.to_atom) end)end)
+    Project2.Exdistutils.start_distributed(:project2)
+    start_link(number_of_node) #this is where the server genserver starts
+    IO.puts "... build topology"
     var=number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round
     type=elem(args|>List.to_tuple,2)
     com=MapSet.new(Enum.into(1..String.to_integer(number_of_node),[]))
