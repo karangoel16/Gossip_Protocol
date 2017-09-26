@@ -91,6 +91,9 @@ defmodule Project2 do
             :Im2d->var*var
           end
           Enum.map(1..temp_val,fn(x)->GenServer.call({x|>Integer.to_string|>String.to_atom,Node.self()},{:add_state,"",x},:infinity)end)
+          rand=number_of_node|>String.to_integer|>:rand.uniform
+          #we are testing failure in the system
+          GenServer.stop({rand|>Integer.to_string|>String.to_atom,Node.self()})
           rand=:rand.uniform(temp_val)
           GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,{},rand,type,0})
       end

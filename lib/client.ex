@@ -74,15 +74,21 @@ defmodule Project2.Client do
                         case tuple_size(msg)==0 do
                             true->
                                 {s,w}=Map.get(map,"state")
-                                GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,{s/2,w/2},elem(elem(state,0),var-1),type,sleep})
-                                #spawn(fn->cast_call(:msg,{s/2,w/2},name,type)end)
+                                case GenServer.whereis({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self()}) != nil do
+                                    true->GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,{s/2,w/2},elem(elem(state,0),var-1),type,sleep})
+                                    false->GenServer.cast({name|>Integer.to_string|>String.to_atom},{:msg,msg,name,type,sleep})
+                                end
+                                 #spawn(fn->cast_call(:msg,{s/2,w/2},name,type)end)
                                 map=Map.put(map,"state",{s+s/2,w+w/2})
                                 map=Map.put(map,"balance",1)
                                 {:noreply,{elem(state,0),map}}
                             false->
                                 case Map.get(map,"balance")>=3 do
                                     true->
-                                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,sleep})
+                                        case GenServer.whereis({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self()}) != nil do
+                                            true->GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,sleep})
+                                            false->GenServer.call({name|>Integer.to_string|>String.to_atom,Node.self()},{:msg,msg,name,type,sleep})
+                                        end
                                         #this is to terminate the node
                                         GenServer.call({:Server,Node.self()},{:add_val,name},:infinity)
                                     {:noreply,state}
@@ -98,8 +104,12 @@ defmodule Project2.Client do
                                             false->Map.put(map,"balance",1)
                                         end
                                         map=Map.put(map,"state",{s1/2+s,w1/2+w})
-                                        GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,{s1/2,w1/2},elem(elem(state,0),var-1),type,sleep})
-                                        {:noreply,{elem(state,0),map}}
+                                        case GenServer.whereis({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self()}) != nil do
+                                            true->GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,{s1/2,w1/2},elem(elem(state,0),var-1),type,sleep})
+                                            {:noreply,{elem(state,0),map}}
+                                            false->GenServer.call({name|>Integer.to_string|>String.to_atom,Node.self()},{:msg,msg,name,type,sleep})
+                                            {:noreply,state}
+                                        end
                                 end
 
                         end
