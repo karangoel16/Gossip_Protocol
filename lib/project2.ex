@@ -77,9 +77,7 @@ defmodule Project2 do
         GenServer.cast({:Server,Node.self()},{:add_time,:os.system_time(:millisecond)})
       case type do
         "gossip"->
-          rand=number_of_node|>String.to_integer|>:rand.uniform
           #we are testing failure in the system
-          GenServer.stop({rand|>Integer.to_string|>String.to_atom,Node.self()})
           rand=number_of_node|>String.to_integer|>:rand.uniform
           GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,"hello",rand,type,4})
         "push-sum"->
@@ -91,12 +89,12 @@ defmodule Project2 do
             :Im2d->var*var
           end
           Enum.map(1..temp_val,fn(x)->GenServer.call({x|>Integer.to_string|>String.to_atom,Node.self()},{:add_state,"",x},:infinity)end)
-          rand=number_of_node|>String.to_integer|>:rand.uniform
           #we are testing failure in the system
-          GenServer.stop({rand|>Integer.to_string|>String.to_atom,Node.self()})
+          #IO.inspect Enum.take_random(Enum.map(1..number_of_node|>String.to_integer,fn(x)->x end),8)
           rand=:rand.uniform(temp_val)
           GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,{},rand,type,0})
       end
+      Enum.map( Enum.take_random(Enum.map(1..String.to_integer(number_of_node),fn(x)->x end),elem(args|>List.to_tuple,3)|>String.to_integer),fn(x)->GenServer.stop({x|>Integer.to_string|>String.to_atom,Node.self()})end);
     loop()
   end
 
