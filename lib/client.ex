@@ -22,11 +22,8 @@ defmodule Project2.Client do
                 map=Map.put(map,"balance",1)
                 {:reply,"",{elem(state,0),map}}
           :line->#we need to add previous and the new state here
-                case :rand.uniform(1000) do#this is done to make failure when the link dies
-                    1->{:reply,"",state}
-                    _->var=Tuple.append(elem(state,0),msg)
-                       {:reply,"",{var,elem(state,1)}}
-                end
+            var=Tuple.append(elem(state,0),msg)
+            {:reply,"",{var,elem(state,1)}}
           :link->#we made this to check our network
                 {:reply,state,state}
       end

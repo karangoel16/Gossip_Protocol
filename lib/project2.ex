@@ -94,7 +94,7 @@ defmodule Project2 do
           rand=:rand.uniform(temp_val)
           GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,{},rand,type,0})
       end
-      Enum.map( Enum.take_random(Enum.map(1..String.to_integer(number_of_node),fn(x)->x end),elem(args|>List.to_tuple,3)|>String.to_integer),fn(x)->GenServer.stop({x|>Integer.to_string|>String.to_atom,Node.self()})end);
+      #Enum.map( Enum.take_random(Enum.map(1..String.to_integer(number_of_node),fn(x)->x end),elem(args|>List.to_tuple,3)|>String.to_integer),fn(x)->GenServer.stop({x|>Integer.to_string|>String.to_atom,Node.self()})end);
     loop()
   end
 
