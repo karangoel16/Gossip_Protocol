@@ -25,7 +25,7 @@ defmodule Project2 do
     IO.puts "... build topology"
     var=number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round
     type=elem(args|>List.to_tuple,2)
-    com=MapSet.new(Enum.into(1..String.to_integer(number_of_node),[]))
+    com=MapSet.new(Enum.into(1..String.to_integer(number_of_node),[]))|>MapSet.to_list|>List.to_tuple
     #com=MapSet.put(MapSet.new,Enum.to_list(1..String.to_integer(number_of_node))|>List.to_tuple)
     case elem(List.to_tuple(args),1)|>String.to_atom do
       :full->Enum.map(1..String.to_integer(number_of_node),fn(x)->GenServer.call({Integer.to_string(x)|>String.to_atom,Node.self()},{:complete,com,x},:infinity)end)

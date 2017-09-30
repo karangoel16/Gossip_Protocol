@@ -15,15 +15,18 @@ defmodule Project2.Client do
     def handle_call({check , msg , name},_from,state) do
       case check do
           :complete->
-                {:reply,"",{MapSet.delete(msg, name)|>MapSet.to_list|>List.to_tuple,elem(state,1)} }
+                {:reply,"",{Tuple.delete_at(msg, name-1),elem(state,1)} }
           :add_state->
                 map=%{}
                 map=Map.put(map,"state",{name,1})
                 map=Map.put(map,"balance",1)
                 {:reply,"",{elem(state,0),map}}
           :line->#we need to add previous and the new state here
-                var=Tuple.append(elem(state,0),msg)
-                {:reply,"",{var,elem(state,1)}}
+                case :rand.uniform(1000) do#this is done to make failure when the link dies
+                    1->{:reply,"",state}
+                    _->var=Tuple.append(elem(state,0),msg)
+                       {:reply,"",{var,elem(state,1)}}
+                end
           :link->#we made this to check our network
                 {:reply,state,state}
       end
