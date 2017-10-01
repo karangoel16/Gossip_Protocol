@@ -29,17 +29,8 @@ defmodule Project2.Client do
       end
     end
     def handle_cast({:msg , msg , name,type ,sleep},state) do
-            wait_time=
-            case tuple_size(elem(state,0)) do
-                4->100
-                5->100
-                2->100
-                1->100
-                3->100
-                _->tuple_size(elem(state,0))|>:math.sqrt|>round
-            end
             #IO.puts wait_time
-            wait_time=100
+            wait_time=10
             var=:rand.uniform(tuple_size(elem(state,0)))
             case sleep do
                 1->case GenServer.whereis({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self()}) != nil do
@@ -57,6 +48,7 @@ defmodule Project2.Client do
                     case Map.get(map,msg,0)>10 do
                     true->
                         GenServer.call({:Server,Node.self()},{:add_val,name},:infinity)
+                        GenServer.stop({name|>Integer.to_string|>String.to_atom,Node.self()})
                         {:noreply,state}
                     false->
                         map=Map.put(map,msg,Map.get(map,msg,0)+1)
