@@ -30,6 +30,15 @@ defmodule Project2.Client do
     end
     def handle_cast({:msg , msg , name,type ,sleep},state) do
             #IO.puts wait_time
+            case  (Enum.into(elem(state,0)|>Tuple.to_list,[],fn(x)->
+                GenServer.whereis({x|>Integer.to_string|>String.to_atom,Node.self()})
+         end))|>List.to_tuple|>tuple_size do
+                0-> #IO.puts "hello"
+                    GenServer.call({:Server,Node.self()},{:add_val,name},:infinity)
+                    GenServer.stop({name|>Integer.to_string|>String.to_atom,Node.self()})
+                    {:noreply,state}
+                _->nil
+            end
             wait_time=10
             var=:rand.uniform(tuple_size(elem(state,0)))
             case sleep do
