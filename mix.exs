@@ -21,7 +21,8 @@ defmodule Project2.Mixfile do
 
   defp escript() do
     [
-    main_module: Project2
+    main_module: Project2,
+    emu_args: [ "+P 5000000" ],
     ]
     end
   # Run "mix help deps" to learn about dependencies.
