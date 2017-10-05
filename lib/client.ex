@@ -102,7 +102,7 @@ defmodule Project2.Client do
                                                 true->GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,{s1/2,w1/2},elem(elem(state,0),var-1),type,sleep})
                                                 GenServer.cast({name|>Integer.to_string|>String.to_atom,Node.self()},{:msg,{s1/2,w1/2},name,type,sleep})
                                                 {:noreply,{elem(state,0),map}}
-                                                false->GenServer.cast({name|>Integer.to_string|>String.to_atom,Node.self()},{:msg,{s1/2,s2/2},name,type,sleep})
+                                                false->GenServer.cast({name|>Integer.to_string|>String.to_atom,Node.self()},{:msg,{s1/2,w1/2},name,type,sleep})
                                                 {:noreply,state}
                                             end
                                     end
