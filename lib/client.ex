@@ -77,7 +77,6 @@ defmodule Project2.Client do
                                         true->
                                             case GenServer.whereis({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self()}) != nil do
                                                 true->GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,msg,elem(elem(state,0),var-1),type,sleep})
-                                                #GenServer.stop({name|>Integer.to_string|>String.to_atom,Node.self()})
                                                 false->GenServer.cast({name|>Integer.to_string|>String.to_atom,Node.self()},{:msg,msg,name,type,sleep})
                                             end
                                             #this is to terminate the node
