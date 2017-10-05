@@ -17,7 +17,7 @@ defmodule Project2 do
       "2d"->:math.pow(number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round,2)|>round|>Integer.to_string
       "full"->number_of_node
       "line"->number_of_node
-      "Im2d"->:math.pow(number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round,2)|>round|>Integer.to_string
+      "imp2d"->:math.pow(number_of_node|>String.to_integer|>:math.sqrt|>:math.ceil|>round,2)|>round|>Integer.to_string
     end
     IO.inspect Enum.map(1..String.to_integer(number_of_node),fn(x)->spawn(fn->Project2.Client.start_link(Integer.to_string(x)|>String.to_atom) end)end)
     Project2.Exdistutils.start_distributed(:project2)
@@ -52,7 +52,7 @@ defmodule Project2 do
                 end)
               end)
              end)
-      :Im2d->
+      :imp2d->
         Enum.map(1..var,fn(row)->
         Enum.map(1..var,fn(col)->
           Enum.map(1..4,fn(x)->
@@ -86,7 +86,7 @@ defmodule Project2 do
             :full->number_of_node|>String.to_integer
             :line->number_of_node|>String.to_integer
             :"2d"->var*var
-            :Im2d->var*var
+            :imp2d->var*var
           end
           Enum.map(1..temp_val,fn(x)->GenServer.call({x|>Integer.to_string|>String.to_atom,Node.self()},{:add_state,"",x},:infinity)end)
           #we are testing failure in the system
