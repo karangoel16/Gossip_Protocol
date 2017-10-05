@@ -116,7 +116,9 @@ defmodule Project2 do
         map=Map.put(elem(state,1),name,1)
         state=Tuple.delete_at(state,1)
         state=Tuple.insert_at(state,1,map)
-        if length(Map.to_list(elem(state,1)))==length(MapSet.to_list(elem(state,0))) do
+        len1=length(Map.to_list(elem(state,1)))
+        len2=length(MapSet.to_list(elem(state,0)))
+        if len2/len1>0.8 do
           IO.puts(:os.system_time(:millisecond)-elem(state,2))
           Enum.map(MapSet.to_list(elem(state,0)),fn(x)->GenServer.stop({Integer.to_string(x)|>String.to_atom,Node.self()})end)
           Process.exit(self(),:normal)

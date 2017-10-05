@@ -100,7 +100,7 @@ defmodule Project2.Client do
                                             case GenServer.whereis({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self()}) != nil do
                                                 true->GenServer.cast({elem(elem(state,0),var-1)|>Integer.to_string|>String.to_atom,Node.self() },{:msg,{s1/2,w1/2},elem(elem(state,0),var-1),type,sleep})
                                                 {:noreply,{elem(state,0),map}}
-                                                false->GenServer.cast({name|>Integer.to_string|>String.to_atom,Node.self()},{:msg,msg,name,type,sleep})
+                                                false->GenServer.cast({name|>Integer.to_string|>String.to_atom,Node.self()},{:msg,{s1/2,w1/2},name,type,sleep})
                                                 {:noreply,state}
                                             end
                                     end
