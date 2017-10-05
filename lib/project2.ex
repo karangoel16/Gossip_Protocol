@@ -78,7 +78,7 @@ defmodule Project2 do
         "gossip"->
           #we are testing failure in the system
           rand=number_of_node|>String.to_integer|>:rand.uniform
-          GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,"hello",rand,type,4})
+          GenServer.cast({rand|>Integer.to_string|>String.to_atom,Node.self()},{:msg,"hello",rand,type,1})
         "push-sum"->
           temp_val=
           case elem(List.to_tuple(args),1)|>String.to_atom do
